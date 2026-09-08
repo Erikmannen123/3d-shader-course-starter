@@ -209,69 +209,95 @@ int main()
     std::cout << "OpenGL: " << glGetString(GL_VERSION) << '\n';
     std::cout << "Renderer: " << glGetString(GL_RENDERER) << '\n';
 
-    // position.xyz, normal.xyz, uv.xy
-    // Each face has its own vertices so it can have one clear, flat normal.
-    // The duplicated vertices also let every face own a full UV square.
-    constexpr float vertices[] = {
-        // Front (+Z)
-        -0.5f, -0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   1.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,   0.0f,  0.0f,  1.0f,   0.0f, 1.0f,
+    glEnable(GL_DEPTH_TEST);
 
-        // Back (-Z)
-         0.5f, -0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,   0.0f,  0.0f, -1.0f,   0.0f, 1.0f,
+    constexpr int GRID_SIZE = 1000;
+    constexpr float PLANE_SIZE = 200.0f;
 
-        // Left (-X)
-        -0.5f, -0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,   0.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,   1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,   1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,   0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,   1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,   0.0f, 1.0f,
+    std::vector<float> vertices;
 
-        // Right (+X)
-         0.5f, -0.5f,  0.5f,   1.0f,  0.0f,  0.0f,   0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,   1.0f,  0.0f,  0.0f,   1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,   1.0f,  0.0f,  0.0f,   1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,   1.0f,  0.0f,  0.0f,   0.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,   1.0f,  0.0f,  0.0f,   1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,   1.0f,  0.0f,  0.0f,   0.0f, 1.0f,
+    for (int z = 0; z <= GRID_SIZE; ++z)
+    {
+        for (int x = 0; x <= GRID_SIZE; ++x)
+        {
+            // Position: -5 to +5
+            float px = (static_cast<float>(x) / GRID_SIZE) * PLANE_SIZE - PLANE_SIZE * 0.5f;
 
-        // Top (+Y)
-        -0.5f,  0.5f,  0.5f,   0.0f,  1.0f,  0.0f,   0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,   0.0f,  1.0f,  0.0f,   1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,   0.0f,  1.0f,  0.0f,   1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,   0.0f,  1.0f,  0.0f,   0.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,   0.0f,  1.0f,  0.0f,   1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,   0.0f,  1.0f,  0.0f,   0.0f, 1.0f,
+            float pz = (static_cast<float>(z) / GRID_SIZE) * PLANE_SIZE - PLANE_SIZE * 0.5f;
 
-        // Bottom (-Y)
-        -0.5f, -0.5f, -0.5f,   0.0f, -1.0f,  0.0f,   0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,   0.0f, -1.0f,  0.0f,   1.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,   0.0f, -1.0f,  0.0f,   1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,   0.0f, -1.0f,  0.0f,   0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,   0.0f, -1.0f,  0.0f,   1.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,   0.0f, -1.0f,  0.0f,   0.0f, 1.0f
-    };
+            // UV: 0 to 1
+            float u = static_cast<float>(x) / GRID_SIZE;
+            float v = static_cast<float>(z) / GRID_SIZE;
+
+            // Position
+            vertices.push_back(px);
+            vertices.push_back(0.0f);
+            vertices.push_back(pz);
+
+            // Normal (pointing up)
+            vertices.push_back(0.0f);
+            vertices.push_back(1.0f);
+            vertices.push_back(0.0f);
+
+            // UV
+            vertices.push_back(u);
+            vertices.push_back(v);
+        }
+    }
+
+    std::vector<unsigned int> indices;
+
+    for (int z = 0; z < GRID_SIZE; ++z)
+    {
+        for (int x = 0; x < GRID_SIZE; ++x)
+        {
+            unsigned int topLeft = z * (GRID_SIZE + 1) + x;
+
+            unsigned int topRight = topLeft + 1;
+
+            unsigned int bottomLeft = (z + 1) * (GRID_SIZE + 1) + x;
+
+            unsigned int bottomRight = bottomLeft + 1;
+
+            // Triangle 1
+            indices.push_back(topLeft);
+            indices.push_back(bottomLeft);
+            indices.push_back(topRight);
+
+            // Triangle 2
+            indices.push_back(topRight);
+            indices.push_back(bottomLeft);
+            indices.push_back(bottomRight);
+        }
+    }
+
 
     GLuint vao = 0;
     GLuint vbo = 0;
+    GLuint ebo = 0;
 
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
+    glGenBuffers(1, &ebo);
 
     glBindVertexArray(vao);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(
+        GL_ARRAY_BUFFER,
+        static_cast<GLsizeiptr>(vertices.size() * sizeof(float)),
+        vertices.data(),
+        GL_STATIC_DRAW
+    );
+
+    // Upload indices into the element array buffer while the VAO is bound
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(
+        GL_ELEMENT_ARRAY_BUFFER,
+        static_cast<GLsizeiptr>(indices.size() * sizeof(unsigned int)),
+        indices.data(),
+        GL_STATIC_DRAW
+    );
 
     constexpr GLsizei stride = 8 * sizeof(float);
 
@@ -315,17 +341,21 @@ int main()
     // used by the known-good opaque shader, but remain available as mask data.
     constexpr int TextureWidth = 4;
     constexpr int TextureHeight = 4;
+
     constexpr unsigned char texturePixels[] = {
-        230,  70,  50, 255,    40, 180, 220,  64,   230,  70,  50, 255,    40, 180, 220,  64,
-         40, 180, 220,  64,   230,  70,  50, 255,    40, 180, 220,  64,   230,  70,  50, 255,
-        230,  70,  50, 255,    40, 180, 220,  64,   230,  70,  50, 255,    40, 180, 220,  64,
-         40, 180, 220,  64,   230,  70,  50, 255,    40, 180, 220,  64,   230,  70,  50, 255
+     42,  42,  42, 255,   187, 187, 187, 255,    91,  91,  91, 255,   231, 231, 231, 255,
+    156, 156, 156, 255,    63,  63,  63, 255,   212, 212, 212, 255,   118, 118, 118, 255,
+    245, 245, 245, 255,    77,  77,  77, 255,   134, 134, 134, 255,    28,  28,  28, 255,
+    103, 103, 103, 255,   201, 201, 201, 255,    55,  55,  55, 255,   174, 174, 174, 255
     };
 
     GLuint texture = 0;
     glGenTextures(1, &texture);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -420,9 +450,9 @@ int main()
     const GLint ambientStrengthLocation = glGetUniformLocation(shaderProgram, "ambientStrength");
     const GLint specularStrengthLocation = glGetUniformLocation(shaderProgram, "specularStrength");
     const GLint shininessLocation = glGetUniformLocation(shaderProgram, "shininess");
-    const GLint surfaceTextureLocation =
-        glGetUniformLocation(shaderProgram, "surfaceTexture");
+    const GLint surfaceTextureLocation =glGetUniformLocation(shaderProgram, "surfaceTexture");
     const GLint timeLocation = glGetUniformLocation(shaderProgram, "time");
+    const GLint planeSizeLocation = glGetUniformLocation(shaderProgram, "planeSize");
 
     if (modelLocation == -1 ||
         viewLocation == -1 ||
@@ -443,8 +473,8 @@ int main()
     // A fixed rotation exposes several faces while keeping the known-good image
     // stable and easy to compare between runs.
     glm::mat4 model(1.0f);
-    model = glm::rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    model = glm::rotate(model, glm::radians(30.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    //model = glm::rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    //model = glm::rotate(model, glm::radians(30.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     // Positions and normals transform differently. The inverse-transpose keeps
     // normals perpendicular to their surfaces, including under non-uniform scale.
@@ -454,19 +484,17 @@ int main()
     // The view matrix converts world-space positions into view space. Moving the
     // world by the negative viewer position places the cube in front of the
     // viewer without introducing a camera class or camera controls.
-    const glm::vec3 viewPosition(0.0f, 0.0f, 3.0f);
-    const glm::mat4 view =
-        glm::translate(glm::mat4(1.0f), -viewPosition);
+    const glm::vec3 viewPosition(0.0f, 0.0f, 25.0f);
+    const glm::mat4 view = glm::translate(glm::mat4(1.0f), -viewPosition);
 
     // This direction points from the surface toward the light. It is not axis-
     // aligned, so more than one visible face receives diffuse illumination.
-    const glm::vec3 lightDirection =
-        glm::normalize(glm::vec3(0.6f, 1.0f, 0.8f));
+    const glm::vec3 lightDirection = glm::normalize(glm::vec3(0.6f, 1.0f, 0.8f));
     const glm::vec3 lightColor(1.0f, 0.96f, 0.90f);
     // White leaves the generated texture's sampled RGB values untinted.
     const glm::vec3 baseColor(1.0f);
     const float ambientStrength = 0.12f;
-    const float specularStrength = 0.28f;
+    const float specularStrength = 0.1f;
     const float shininess = 32.0f;
 
     // These values define the perspective viewing volume. Keeping them named and
@@ -474,7 +502,7 @@ int main()
     // or when the near and far clipping planes move?
     const float fieldOfView = glm::radians(45.0f);
     const float nearPlane = 0.1f;
-    const float farPlane = 100.0f;
+    const float farPlane = 1000.0f;
 
     while (glfwWindowShouldClose(window) == GLFW_FALSE)
     {
@@ -516,6 +544,21 @@ int main()
         const glm::mat4 projection =
             glm::perspective(fieldOfView, aspectRatio, nearPlane, farPlane);
 
+
+        //Rotate camera around the origin
+        const float radius = 70.0f;
+        const float speed = 0.1f;
+        float camX = sin(glfwGetTime() * speed) * radius;
+        float camZ = cos(glfwGetTime() * speed) * radius;
+        glm::mat4 view;
+        view = glm::lookAt(glm::vec3(camX, 4.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+
+        /*
+        //Look at pos
+        glm::mat4 view;
+        view = glm::lookAt(glm::vec3(0, 5.0, 0), glm::vec3(0.6f, 1.0f, 0.8f), glm::vec3(0.0, 1.0, 0.0));
+        */
+
         // PASS 1: render the scene into the off-screen framebuffer.
         // Binding selects where clears and fragment outputs go. The viewport
         // maps clip-space results into that target; binding an FBO does not set it.
@@ -524,7 +567,7 @@ int main()
         glEnable(GL_DEPTH_TEST);
         // Depth must be enabled again each frame because pass 2 disables it.
         // Clear last frame's colour and depth before resolving cube visibility.
-        glClearColor(0.08f, 0.09f, 0.12f, 1.0f);
+        glClearColor(0.66, 0.847, 1, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glUseProgram(shaderProgram);
@@ -548,12 +591,23 @@ int main()
         glUniform1i(surfaceTextureLocation, 0);
         glUniform1f(timeLocation, static_cast<float>(glfwGetTime()));
 
+        if (planeSizeLocation != -1)
+            glUniform1f(planeSizeLocation, PLANE_SIZE);
+
         // Restore the cube's surface texture: pass 2 used this same unit for
         // the scene image. The cube must not sample the target it is writing into.
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
         glBindVertexArray(vao);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        //glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        glBindVertexArray(vao);
+        glDrawElements(
+            GL_TRIANGLES,
+            static_cast<GLsizei>(indices.size()),
+            GL_UNSIGNED_INT,
+            nullptr
+        );
 
         // PASS 2: render the scene texture to the default framebuffer.
         // Framebuffer 0 is the window's default framebuffer. The scene texture

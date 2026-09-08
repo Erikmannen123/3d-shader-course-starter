@@ -11,5 +11,7 @@ void main()
 {
     // Pass-through: display pass 1's colour, including its cleared background.
     // Lighting is already in this image; we do not calculate it a second time.
+    //vec3 color = texture(sceneTexture, screenUV).rgb;
+    //FragColor = vec4(color, 1.0);
     FragColor = texture(sceneTexture, screenUV);
 }
