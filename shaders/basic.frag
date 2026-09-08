@@ -74,6 +74,7 @@ void main()
     vec3 H = normalize(L + V);
 
     // Only a surface facing the light may receive a specular highlight.
+    //use mask to change the shininess of the water and foam
     float waterShininess = 10;
     float foamShininess = 32;
     float shininess = mix(waterShininess, foamShininess, foamMask);

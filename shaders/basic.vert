@@ -25,24 +25,20 @@ void main()
     vec3 displacedPosition = vec3(0,0,0);
 
     vec3 dir1 = vec3(0.9,0,0.8); 
-    //dir1 = normalize(dir1);
 
     vec3 dir2 = vec3(0.7,0,0.9); 
-    //dir2 = normalize(dir2);
 
     vec3 dir3 = vec3(0.9,0,0.7); 
-    //dir3 = normalize(dir3);
 
-    vec3 dir4 = vec3(1,0,0.5); 
-    //dir4 = normalize(dir4);
+    vec3 dir4 = vec3(0.5,0,0.5); 
 
-    vec3 dir5 = vec3(0.5,0,0.5); 
+    vec3 dir5 = vec3(1,0,0.5); 
 
-    float waveFrecuency1 = 1;
+    float waveFrecuency1 = 0.5;
     float waveFrecuency2 = 1.5;
     float waveFrecuency3 = 0.7;
     float waveFrecuency4 = 2;
-    float waveFrecuency5 = 7;
+    float waveFrecuency5 = 3;
     float waveHeight = 1.5;
     float overhang = 2;
     float waveSpeed = time * 2;
@@ -53,10 +49,11 @@ void main()
     wave += sin((aPosition.x * -dir2.x + aPosition.z * -dir2.z) * waveFrecuency2 + waveSpeed * 1) * 0.8;
     wave += sin((aPosition.x * -dir3.x + aPosition.z * -dir2.z) * waveFrecuency3 + waveSpeed * 0.1) * 0.9;
     wave += sin((aPosition.x * -dir4.x + aPosition.z * -dir3.z) * waveFrecuency4 + waveSpeed * 1.2) * 0.3;
-    wave += sin((aPosition.x * -dir5.x + aPosition.z * -dir4.z) * waveFrecuency5 + waveSpeed * 5) * 0.1;
-    
+    wave += sin((aPosition.x * -dir5.x + aPosition.z * -dir4.z) * waveFrecuency5 + waveSpeed * 0.01) * 0.04;
+
     wave *= waveHeight * 0.1;
-    displacedPosition.xyz += wave * dir1 * overhang;
+    vec3 waveOffset = wave * dir1 * overhang;
+    displacedPosition.xyz += waveOffset;
     displacedPosition.y = aPosition.y + wave;
 
     displacedMat = displacedPosition.y - aPosition.y;
@@ -80,7 +77,16 @@ void main()
 
     // Normal path: local direction -> world direction. Translation must not
     // affect a direction, so normals use a mat3 normal matrix rather than model.
-    worldNormal = normalMatrix * aNormal;
+    vec3 posX = aPosition + vec3(waveOffset.x, 0, 0);
+    vec3 posZ = aPosition + vec3(0, 0, waveOffset.z);
+
+    vec3 tangentX = posX - aPosition;
+    vec3 tangentZ = posZ - aPosition;
+
+    vec3 displacedNormal = normalize(cross(tangentZ, tangentX));
+
+    worldNormal = normalMatrix * displacedNormal;
+    //worldNormal = normalMatrix * aNormal;
 
     // UVs use their own surface-coordinate domain and pass through unchanged.
     uv = aUV;

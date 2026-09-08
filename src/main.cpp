@@ -484,17 +484,17 @@ int main()
     // The view matrix converts world-space positions into view space. Moving the
     // world by the negative viewer position places the cube in front of the
     // viewer without introducing a camera class or camera controls.
-    const glm::vec3 viewPosition(0.0f, 0.0f, 25.0f);
-    const glm::mat4 view = glm::translate(glm::mat4(1.0f), -viewPosition);
+    //const glm::vec3 viewPosition(0.0f, 0.0f, 25.0f);
+    //const glm::mat4 view = glm::translate(glm::mat4(1.0f), -viewPosition);
 
     // This direction points from the surface toward the light. It is not axis-
     // aligned, so more than one visible face receives diffuse illumination.
-    const glm::vec3 lightDirection = glm::normalize(glm::vec3(0.6f, 1.0f, 0.8f));
+    const glm::vec3 lightDirection = glm::normalize(glm::vec3(-0.4f, 1.0f, -0.3f));
     const glm::vec3 lightColor(1.0f, 0.96f, 0.90f);
     // White leaves the generated texture's sampled RGB values untinted.
     const glm::vec3 baseColor(1.0f);
     const float ambientStrength = 0.12f;
-    const float specularStrength = 0.1f;
+    const float specularStrength = 0.29f;
     const float shininess = 32.0f;
 
     // These values define the perspective viewing volume. Keeping them named and
@@ -551,7 +551,8 @@ int main()
         float camX = sin(glfwGetTime() * speed) * radius;
         float camZ = cos(glfwGetTime() * speed) * radius;
         glm::mat4 view;
-        view = glm::lookAt(glm::vec3(camX, 4.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+        view = glm::lookAt(glm::vec3(camX, 20.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+        const glm::vec3 viewPosition(camX, 20.0, camZ);
 
         /*
         //Look at pos
