@@ -24,11 +24,11 @@ void main()
 {
     vec3 displacedPosition = vec3(0,0,0);
 
-    vec3 dir1 = vec3(0.9,0,0.8); 
+    vec3 dir1 = vec3(1,0,1); 
 
-    vec3 dir2 = vec3(0.7,0,0.9); 
+    vec3 dir2 = vec3(0.9,0,0.8); 
 
-    vec3 dir3 = vec3(0.9,0,0.7); 
+    vec3 dir3 = vec3(1.1,0,1.3); 
 
     vec3 dir4 = vec3(0.5,0,0.5); 
 
@@ -36,9 +36,9 @@ void main()
 
     float waveFrecuency1 = 0.5;
     float waveFrecuency2 = 1.5;
-    float waveFrecuency3 = 0.7;
+    float waveFrecuency3 = 1.3;
     float waveFrecuency4 = 2;
-    float waveFrecuency5 = 3;
+    float waveFrecuency5 = 2.5;
     float waveHeight = 1.5;
     float overhang = 2;
     float waveSpeed = time * 2;
@@ -46,10 +46,10 @@ void main()
     displacedPosition = aPosition;
 
     float wave = asin(sin((aPosition.x * -dir1.x + aPosition.z * -dir1.z) * waveFrecuency1 + waveSpeed));
-    wave += sin((aPosition.x * -dir2.x + aPosition.z * -dir2.z) * waveFrecuency2 + waveSpeed * 1) * 0.8;
-    wave += sin((aPosition.x * -dir3.x + aPosition.z * -dir2.z) * waveFrecuency3 + waveSpeed * 0.1) * 0.9;
-    wave += sin((aPosition.x * -dir4.x + aPosition.z * -dir3.z) * waveFrecuency4 + waveSpeed * 1.2) * 0.3;
-    wave += sin((aPosition.x * -dir5.x + aPosition.z * -dir4.z) * waveFrecuency5 + waveSpeed * 0.01) * 0.04;
+    wave += sin((aPosition.x * -dir2.x + aPosition.z * -dir2.z) * waveFrecuency2 + waveSpeed * 0.9) * 0.8;
+    wave += sin((aPosition.x * -dir3.x + aPosition.z * -dir3.z) * waveFrecuency3 + waveSpeed * 0.7) * 0.9;
+    wave += sin((aPosition.x * -dir4.x + aPosition.z * -dir4.z) * waveFrecuency4 + waveSpeed * 1.2) * 0.3;
+    wave += sin((aPosition.x * -dir5.x + aPosition.z * -dir5.z) * waveFrecuency5 + waveSpeed * 0.01) * 0.1;
 
     wave *= waveHeight * 0.1;
     vec3 waveOffset = wave * dir1 * overhang;

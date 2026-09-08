@@ -547,12 +547,13 @@ int main()
 
         //Rotate camera around the origin
         const float radius = 70.0f;
-        const float speed = 0.1f;
+        const float speed = 0.2f;
+        const float height = 10.0f;
         float camX = sin(glfwGetTime() * speed) * radius;
         float camZ = cos(glfwGetTime() * speed) * radius;
         glm::mat4 view;
-        view = glm::lookAt(glm::vec3(camX, 20.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
-        const glm::vec3 viewPosition(camX, 20.0, camZ);
+        view = glm::lookAt(glm::vec3(camX, height, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+        const glm::vec3 viewPosition(camX, height, camZ);
 
         /*
         //Look at pos
