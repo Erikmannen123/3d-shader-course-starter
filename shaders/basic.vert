@@ -34,7 +34,7 @@ void main()
 
     vec3 dir5 = vec3(1,0,0.5); 
 
-    float waveFrecuency1 = 0.5;
+    float waveFrecuency1 = 0.3;
     float waveFrecuency2 = 1.5;
     float waveFrecuency3 = 1.3;
     float waveFrecuency4 = 2;

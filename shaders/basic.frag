@@ -25,10 +25,10 @@ out vec4 FragColor; // The colour produced for this fragment.
 
 void main()
 {
+    //Waves////////////////////////////////////////////////////////////////////////////////////
     float UVScale = 1.0;
     vec3 colorTint = vec3(0.114, 0.557, 0.922);
     vec3 waveColorTint = vec3(0.318, 0.671, 0.961);
-    //vec3 waveColorTint = vec3(0.114, 0.557, 0.922);
     vec3 foamTint = vec3(0.89, 1, 1);
     float Brightness = 1.0;
     float Contrast = 0.05;
@@ -60,9 +60,24 @@ void main()
 
     alpha = mix(waterAlpha, foamAlpha, foamMask);
 
-    //Applying Texture
-    //materialColor = mix(combinedTint, materialColor, Contrast);
-    materialColor = combinedTint;
+
+
+    //Fog////////////////////////////////////////////////////////////////////////////////////
+
+    vec3 fogColor = vec3(0.8, 0.9, 0.9);
+    float fogDensity = 0.02;
+    float fogHeight = 10.0;
+
+    float heightFactor = exp(-max(worldPosition.y - fogHeight, 0.0) * fogDensity);
+
+    float distToCam = length(worldPosition - viewPosition);
+
+    float fogAmount = 1 - exp(-fogDensity * distToCam * heightFactor);
+    fogAmount = clamp(fogAmount,0,1);
+
+    vec3 combinedColor = mix(combinedTint, fogColor, fogAmount);
+
+    materialColor = combinedColor;
 
     // Interpolation can change a normal's length, so normalize per fragment.
     vec3 N = normalize(worldNormal);

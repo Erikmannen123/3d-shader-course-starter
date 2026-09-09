@@ -211,6 +211,8 @@ int main()
 
     glEnable(GL_DEPTH_TEST);
 
+    //Generating plane
+
     constexpr int GRID_SIZE = 1000;
     constexpr float PLANE_SIZE = 200.0f;
 
@@ -271,7 +273,6 @@ int main()
         }
     }
 
-
     GLuint vao = 0;
     GLuint vbo = 0;
     GLuint ebo = 0;
@@ -298,6 +299,7 @@ int main()
         indices.data(),
         GL_STATIC_DRAW
     );
+
 
     constexpr GLsizei stride = 8 * sizeof(float);
 
@@ -547,8 +549,8 @@ int main()
 
         //Rotate camera around the origin
         const float radius = 70.0f;
-        const float speed = 0.2f;
-        const float height = 10.0f;
+        const float speed = 0.03f;
+        const float height = 5.0f;
         float camX = sin(glfwGetTime() * speed) * radius;
         float camZ = cos(glfwGetTime() * speed) * radius;
         glm::mat4 view;
@@ -567,10 +569,12 @@ int main()
         glBindFramebuffer(GL_FRAMEBUFFER, sceneFramebuffer);
         glViewport(0, 0, sceneWidth, sceneHeight);
         glEnable(GL_DEPTH_TEST);
+        glDisable(GL_CULL_FACE);
         // Depth must be enabled again each frame because pass 2 disables it.
         // Clear last frame's colour and depth before resolving cube visibility.
         glClearColor(0.66, 0.847, 1, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 
         glUseProgram(shaderProgram);
 
@@ -579,10 +583,8 @@ int main()
         // layout directly, without transposing it during the upload.
         glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
         glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(
-            projectionLocation, 1, GL_FALSE, glm::value_ptr(projection));
-        glUniformMatrix3fv(
-            normalMatrixLocation, 1, GL_FALSE, glm::value_ptr(normalMatrix));
+        glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projection));
+        glUniformMatrix3fv(normalMatrixLocation, 1, GL_FALSE, glm::value_ptr(normalMatrix));
         glUniform3fv(lightDirectionLocation, 1, glm::value_ptr(lightDirection));
         glUniform3fv(lightColorLocation, 1, glm::value_ptr(lightColor));
         glUniform3fv(viewPositionLocation, 1, glm::value_ptr(viewPosition));
