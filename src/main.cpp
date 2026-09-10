@@ -319,6 +319,7 @@ int main()
 
     GLuint shaderProgram = 0;
     GLuint screenProgram = 0;
+    GLuint skyboxProgram = 0;
 
     try
     {
@@ -326,6 +327,8 @@ int main()
             createShaderProgram("shaders/basic.vert", "shaders/basic.frag");
         screenProgram =
             createShaderProgram("shaders/screen.vert", "shaders/screen.frag");
+        skyboxProgram =
+            createShaderProgram("shaders/skybox.vert", "shaders/skybox.frag");
     }
     catch (const std::exception& exception)
     {
@@ -374,6 +377,94 @@ int main()
         GL_RGBA,
         GL_UNSIGNED_BYTE,
         texturePixels);
+
+
+    //Skybox
+    constexpr float skyboxVertices[] = {
+        // Back
+        -1.0f,  1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+
+         1.0f, -1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        // Front
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+
+         1.0f,  1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+        // Left
+        -1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+
+        -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f,
+
+        // Right
+         1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f, -1.0f,
+
+         1.0f,  1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f,  1.0f,
+
+         // Bottom
+         -1.0f, -1.0f, -1.0f,
+         -1.0f, -1.0f,  1.0f,
+          1.0f, -1.0f,  1.0f,
+
+          1.0f, -1.0f,  1.0f,
+          1.0f, -1.0f, -1.0f,
+         -1.0f, -1.0f, -1.0f,
+
+         // Top
+         -1.0f,  1.0f,  1.0f,
+         -1.0f,  1.0f, -1.0f,
+          1.0f,  1.0f, -1.0f,
+
+          1.0f,  1.0f, -1.0f,
+          1.0f,  1.0f,  1.0f,
+         -1.0f,  1.0f,  1.0f
+    };
+
+    GLuint skyboxVao = 0;
+    GLuint skyboxVbo = 0;
+
+    glGenVertexArrays(1, &skyboxVao);
+    glGenBuffers(1, &skyboxVbo);
+
+    glBindVertexArray(skyboxVao);
+
+    glBindBuffer(GL_ARRAY_BUFFER, skyboxVbo);
+    glBufferData(
+        GL_ARRAY_BUFFER,
+        sizeof(skyboxVertices),
+        skyboxVertices,
+        GL_STATIC_DRAW
+    );
+
+    glVertexAttribPointer(
+        0,
+        3,
+        GL_FLOAT,
+        GL_FALSE,
+        3 * sizeof(float),
+        nullptr
+    );
+
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(0);
+
 
     // Separate geometry for pass 2: position.xy in clip space, then uv.xy.
     // Two triangles cover the entire viewport. Unlike the cube, this geometry
@@ -455,6 +546,24 @@ int main()
     const GLint surfaceTextureLocation =glGetUniformLocation(shaderProgram, "surfaceTexture");
     const GLint timeLocation = glGetUniformLocation(shaderProgram, "time");
     const GLint planeSizeLocation = glGetUniformLocation(shaderProgram, "planeSize");
+    //Fog
+    const GLint fogDensityLocation = glGetUniformLocation(shaderProgram, "fogDensity");
+    const GLint fogHeightLocation = glGetUniformLocation(shaderProgram, "fogHeight");
+    const GLint fogHeightFalloffLocation = glGetUniformLocation(shaderProgram, "fogHeightFalloff");
+    const GLint skyColorLocation = glGetUniformLocation(shaderProgram, "skyColor");
+    const GLint fogColorLocation = glGetUniformLocation(shaderProgram, "fogColor");
+
+    //Skybox uniforms
+    const GLint skyboxViewLocation = glGetUniformLocation(skyboxProgram, "view");
+    const GLint skyboxProjectionLocation = glGetUniformLocation(skyboxProgram, "projection");
+    const GLint skyboxViewPositionLocation = glGetUniformLocation(skyboxProgram, "viewPosition");
+    //Fog
+    const GLint skyboxFogDensityLocation = glGetUniformLocation(skyboxProgram, "fogDensity");
+    const GLint skyboxFogHeightLocation = glGetUniformLocation(skyboxProgram, "fogHeight");
+    const GLint skyboxFogHeightFalloffLocation = glGetUniformLocation(skyboxProgram, "fogHeightFalloff");
+    const GLint skyboxSkyColorLocation = glGetUniformLocation(skyboxProgram, "skyColor");
+    const GLint skyboxFogColorLocation = glGetUniformLocation(skyboxProgram, "fogColor");
+
 
     if (modelLocation == -1 ||
         viewLocation == -1 ||
@@ -506,6 +615,15 @@ int main()
     const float nearPlane = 0.1f;
     const float farPlane = 1000.0f;
 
+    //fog uniforms
+	const float fogDensity = 0.05f;
+	const float fogHeight = 0.07f;
+	const float fogHeightFalloff = 0.05f;
+
+	const glm::vec3 skyColor(0.66f, 0.847f, 1.0f);
+	//const glm::vec3 skyColor(0.0f, 0.0f, 0.0f);
+	const glm::vec3 fogColor(0.8, 0.9, 0.9);
+
     while (glfwWindowShouldClose(window) == GLFW_FALSE)
     {
         processInput(window);
@@ -548,7 +666,7 @@ int main()
 
 
         //Rotate camera around the origin
-        const float radius = 70.0f;
+        const float radius = 100.0f;
         const float speed = 0.03f;
         const float height = 5.0f;
         float camX = sin(glfwGetTime() * speed) * radius;
@@ -569,12 +687,41 @@ int main()
         glBindFramebuffer(GL_FRAMEBUFFER, sceneFramebuffer);
         glViewport(0, 0, sceneWidth, sceneHeight);
         glEnable(GL_DEPTH_TEST);
-        glDisable(GL_CULL_FACE);
+        //glDisable(GL_CULL_FACE);
         // Depth must be enabled again each frame because pass 2 disables it.
         // Clear last frame's colour and depth before resolving cube visibility.
         glClearColor(0.66, 0.847, 1, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
+		//Skybox////////////////////////////////////////////////////
+
+
+        glDepthFunc(GL_LEQUAL);
+        glDisable(GL_CULL_FACE);
+
+        glUseProgram(skyboxProgram);
+
+        glUniformMatrix4fv(skyboxViewLocation,1,GL_FALSE,glm::value_ptr(view));
+        glUniformMatrix4fv(skyboxProjectionLocation,1,GL_FALSE,glm::value_ptr(projection));
+        glUniform3fv(skyboxViewPositionLocation, 1, glm::value_ptr(viewPosition));
+        glUniform1f(skyboxFogDensityLocation, fogDensity);
+        glUniform1f(skyboxFogHeightLocation, fogHeight);
+        glUniform1f(skyboxFogHeightFalloffLocation, fogHeightFalloff);
+        glUniform3fv(skyboxSkyColorLocation, 1, glm::value_ptr(skyColor));
+        glUniform3fv(skyboxFogColorLocation, 1, glm::value_ptr(fogColor));
+
+        glBindVertexArray(skyboxVao);
+
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+        // Restore normal depth testing for the plane.
+        glDepthFunc(GL_LESS);
+
+
+
+        //Plane////////////////////////////////////////////////////
 
         glUseProgram(shaderProgram);
 
@@ -594,6 +741,12 @@ int main()
         glUniform1f(shininessLocation, shininess);
         glUniform1i(surfaceTextureLocation, 0);
         glUniform1f(timeLocation, static_cast<float>(glfwGetTime()));
+        glUniform1f(fogDensityLocation, fogDensity);
+        glUniform1f(fogHeightLocation, fogHeight);
+        glUniform1f(fogHeightFalloffLocation, fogHeightFalloff);
+        glUniform3fv(skyColorLocation, 1, glm::value_ptr(skyColor));
+        glUniform3fv(fogColorLocation, 1, glm::value_ptr(fogColor));
+
 
         if (planeSizeLocation != -1)
             glUniform1f(planeSizeLocation, PLANE_SIZE);
@@ -640,9 +793,15 @@ int main()
     glDeleteProgram(screenProgram);
     glDeleteBuffers(1, &screenVbo);
     glDeleteVertexArrays(1, &screenVao);
+
+    glDeleteBuffers(1, &skyboxVbo);
+    glDeleteVertexArrays(1, &skyboxVao);
+    glDeleteProgram(skyboxProgram);
+
     glDeleteFramebuffers(1, &sceneFramebuffer);
     glDeleteTextures(1, &sceneColorTexture);
     glDeleteRenderbuffers(1, &sceneDepthStencil);
+
     glDeleteProgram(shaderProgram);
     glDeleteTextures(1, &texture);
     glDeleteBuffers(1, &vbo);

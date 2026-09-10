@@ -40,14 +40,14 @@ void main()
     float waveFrecuency4 = 2;
     float waveFrecuency5 = 2.5;
     float waveHeight = 1.5;
-    float overhang = 2;
+    float overhang = 1.7;
     float waveSpeed = time * 2;
 
     displacedPosition = aPosition;
 
-    float wave = asin(sin((aPosition.x * -dir1.x + aPosition.z * -dir1.z) * waveFrecuency1 + waveSpeed));
-    wave += sin((aPosition.x * -dir2.x + aPosition.z * -dir2.z) * waveFrecuency2 + waveSpeed * 0.9) * 0.8;
-    wave += sin((aPosition.x * -dir3.x + aPosition.z * -dir3.z) * waveFrecuency3 + waveSpeed * 0.7) * 0.9;
+    float wave = sin((aPosition.x * -dir1.x + aPosition.z * -dir1.z) * waveFrecuency1 + waveSpeed);
+    wave += sin((aPosition.x * -dir2.x + aPosition.z * -dir2.z) * waveFrecuency2 + waveSpeed * 1.1) * 0.8;
+    wave += sin((aPosition.x * -dir3.x + aPosition.z * -dir3.z) * waveFrecuency3 + waveSpeed * 0.9) * 0.9;
     wave += sin((aPosition.x * -dir4.x + aPosition.z * -dir4.z) * waveFrecuency4 + waveSpeed * 1.2) * 0.3;
     wave += sin((aPosition.x * -dir5.x + aPosition.z * -dir5.z) * waveFrecuency5 + waveSpeed * 0.01) * 0.1;
 

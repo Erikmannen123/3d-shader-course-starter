@@ -21,6 +21,11 @@ uniform sampler2D surfaceTexture;
 uniform float planeSize;
 uniform float time;
 
+uniform float fogDensity;
+uniform float fogHeight;
+uniform float fogHeightFalloff;
+uniform vec3 fogColor;
+
 out vec4 FragColor; // The colour produced for this fragment.
 
 void main()
@@ -56,28 +61,9 @@ void main()
 
     //Combinding tints
     vec3 waveWaterCombined = mix(waveColorTint, colorTint, waveMask);
-    vec3 combinedTint = mix(waveWaterCombined, foamTint, foamMask);
+    materialColor = mix(waveWaterCombined, foamTint, foamMask);
 
     alpha = mix(waterAlpha, foamAlpha, foamMask);
-
-
-
-    //Fog////////////////////////////////////////////////////////////////////////////////////
-
-    vec3 fogColor = vec3(0.8, 0.9, 0.9);
-    float fogDensity = 0.02;
-    float fogHeight = 10.0;
-
-    float heightFactor = exp(-max(worldPosition.y - fogHeight, 0.0) * fogDensity);
-
-    float distToCam = length(worldPosition - viewPosition);
-
-    float fogAmount = 1 - exp(-fogDensity * distToCam * heightFactor);
-    fogAmount = clamp(fogAmount,0,1);
-
-    vec3 combinedColor = mix(combinedTint, fogColor, fogAmount);
-
-    materialColor = combinedColor;
 
     // Interpolation can change a normal's length, so normalize per fragment.
     vec3 N = normalize(worldNormal);
@@ -91,8 +77,9 @@ void main()
     // Only a surface facing the light may receive a specular highlight.
     //use mask to change the shininess of the water and foam
     float waterShininess = 10;
-    float foamShininess = 32;
-    float shininess = mix(waterShininess, foamShininess, foamMask);
+    float foamShininess = 15;
+    //float shininess = mix(waterShininess, foamShininess, foamMask);
+    float shininess = 10;
     float specular = 0.0;
     if (diffuse > 0.0)
     {
@@ -104,6 +91,35 @@ void main()
     vec3 specularColor = specularStrength * specular * lightColor;
 
     vec3 color = ambientColor + diffuseColor + specularColor;
+
+
+    //Fog////////////////////////////////////////////////////////////////////////////////////
+
+    //Dist from point to camera
+    float distanceToCamera = length(vertexPos - viewPosition);
+
+    //Fog height offset
+    float cameraHeight = viewPosition.y - fogHeight;
+    float pointHeight = vertexPos.y - fogHeight;
+
+    //clamping height below 0
+    cameraHeight = max(cameraHeight, 0.0);
+    pointHeight = max(pointHeight, 0.0);
+
+    //Exponential height density
+    float cameraDensity = exp(-cameraHeight * fogHeightFalloff);
+    float pointDensity = exp(-pointHeight * fogHeightFalloff);
+
+    float heightFactor = (cameraDensity + pointDensity) * 0.5;
+
+    float fogAmount = 1.0 - exp(-fogDensity / 2 * distanceToCamera + 2 * heightFactor);
+    fogAmount = clamp(fogAmount, 0.0, 1.0);
+
+    color = mix(color, fogColor, fogAmount);
+
+
+
+
     FragColor = vec4(color, alpha);
 
 }
