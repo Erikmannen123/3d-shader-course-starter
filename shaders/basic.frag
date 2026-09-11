@@ -38,14 +38,12 @@ void main()
     float Brightness = 1.0;
     float Contrast = 0.05;
     float alpha = 1;
-    float waterAlpha = 1;
-    float foamAlpha = 1;
+    //float waterAlpha = 1;
+    //float foamAlpha = 1;
     float foamScale = 1.0;
 
-    vec4 texel = texture(surfaceTexture, uv * UVScale * planeSize);
-    vec3 materialColor = texel.rgb * baseColor * Brightness;
-
-    float waveMask = clamp(((-displacedMat + 0.2) * 1),0,1);
+    //vec4 texel = texture(surfaceTexture, uv * UVScale * planeSize);
+    //vec3 materialColor = texel.rgb * baseColor * Brightness;
 
     //wave foam Pattern
     float noise = sin(vertexPos.x + vertexPos.z * foamScale * 2);
@@ -55,15 +53,18 @@ void main()
     noise += sin(vertexPos.z + vertexPos.x * foamScale * 50);
     noise -= sin(vertexPos.z + vertexPos.x * foamScale * 30);
     
+    float waveMask = clamp(((-displacedMat + 0.2) * 1),0,1);
+
+    //Combinding noise mask with gradient mask
     float foamNoiseMask = clamp(((displacedMat + 0.5) * 0.6),0,1);
     float foamMask = clamp(((displacedMat - 0.4) * 1),0,1);
-    foamMask = clamp(foamMask * 1.0 + clamp(noise * foamNoiseMask,0,1) * 0.3,0,1);
+    foamMask = clamp(foamMask + clamp(noise * foamNoiseMask,0,1) * 0.3,0,1);
 
     //Combinding tints
     vec3 waveWaterCombined = mix(waveColorTint, colorTint, waveMask);
-    materialColor = mix(waveWaterCombined, foamTint, foamMask);
+    vec3 materialColor = mix(waveWaterCombined, foamTint, foamMask);
 
-    alpha = mix(waterAlpha, foamAlpha, foamMask);
+    //alpha = mix(waterAlpha, foamAlpha, foamMask);
 
     // Interpolation can change a normal's length, so normalize per fragment.
     vec3 N = normalize(worldNormal);
@@ -76,8 +77,8 @@ void main()
 
     // Only a surface facing the light may receive a specular highlight.
     //use mask to change the shininess of the water and foam
-    float waterShininess = 10;
-    float foamShininess = 15;
+    //float waterShininess = 10;
+    //float foamShininess = 15;
     //float shininess = mix(waterShininess, foamShininess, foamMask);
     float shininess = 10;
     float specular = 0.0;

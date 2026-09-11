@@ -212,7 +212,7 @@ int main()
     glEnable(GL_DEPTH_TEST);
 
     //Generating plane
-
+    //AI helped with this code
     constexpr int GRID_SIZE = 1000;
     constexpr float PLANE_SIZE = 200.0f;
 
@@ -667,7 +667,7 @@ int main()
 
         //Rotate camera around the origin
         const float radius = 100.0f;
-        const float speed = 0.03f;
+        const float speed = 0.05f;
         const float height = 5.0f;
         float camX = sin(glfwGetTime() * speed) * radius;
         float camZ = cos(glfwGetTime() * speed) * radius;

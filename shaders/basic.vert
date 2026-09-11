@@ -39,28 +39,36 @@ void main()
     float waveFrecuency3 = 1.3;
     float waveFrecuency4 = 2;
     float waveFrecuency5 = 2.5;
+
+    float waveAmplitude1 = 1;
+    float waveAmplitude2 = 0.8;
+    float waveAmplitude3 = 0.9;
+    float waveAmplitude4 = 0.3;
+    float waveAmplitude5 = 0.1;
+
     float waveHeight = 1.5;
     float overhang = 1.7;
     float waveSpeed = time * 2;
 
     displacedPosition = aPosition;
 
-    float wave = sin((aPosition.x * -dir1.x + aPosition.z * -dir1.z) * waveFrecuency1 + waveSpeed);
-    wave += sin((aPosition.x * -dir2.x + aPosition.z * -dir2.z) * waveFrecuency2 + waveSpeed * 1.1) * 0.8;
-    wave += sin((aPosition.x * -dir3.x + aPosition.z * -dir3.z) * waveFrecuency3 + waveSpeed * 0.9) * 0.9;
-    wave += sin((aPosition.x * -dir4.x + aPosition.z * -dir4.z) * waveFrecuency4 + waveSpeed * 1.2) * 0.3;
-    wave += sin((aPosition.x * -dir5.x + aPosition.z * -dir5.z) * waveFrecuency5 + waveSpeed * 0.01) * 0.1;
+    float wave = sin((aPosition.x * -dir1.x + aPosition.z * -dir1.z) * waveFrecuency1 + waveSpeed) * waveAmplitude1;
+    wave += sin((aPosition.x * -dir2.x + aPosition.z * -dir2.z) * waveFrecuency2 + waveSpeed * 1.1) * waveAmplitude2;
+    wave += sin((aPosition.x * -dir3.x + aPosition.z * -dir3.z) * waveFrecuency3 + waveSpeed * 0.9) * waveAmplitude3;
+    wave += sin((aPosition.x * -dir4.x + aPosition.z * -dir4.z) * waveFrecuency4 + waveSpeed * 1.2) * waveAmplitude4;
+    wave += sin((aPosition.x * -dir5.x + aPosition.z * -dir5.z) * waveFrecuency5 + waveSpeed * 0.01) * waveAmplitude5;
 
     wave *= waveHeight * 0.1;
+    //Creating overhang in the dir1 direction
     vec3 waveOffset = wave * dir1 * overhang;
+    //adding the displacement to the existing positions
     displacedPosition.xyz += waveOffset;
     displacedPosition.y = aPosition.y + wave;
 
-    displacedMat = displacedPosition.y - aPosition.y;
-
-    //displacedPosition = vec3(displacedPosition.x * overhang, displacedPosition.y * waveHeight, displacedPosition.z * overhang) + aPosition;
+    //displacedMat = displacedPosition.y - aPosition.y;
     displacedMat = (displacedPosition.x - aPosition.x) + (displacedPosition.z - aPosition.z);
-
+    
+    //displacedPosition = vec3(displacedPosition.x * overhang, displacedPosition.y * waveHeight, displacedPosition.z * overhang) + aPosition;
     /*
     //displacedPosition -= sin((aPosition.x * dir.x + aPosition.z * dir.z) * waveFrecuency + time * 5);
     //displacedPosition = vec3(displacedPosition.x * overhang, displacedPosition.y * waveHeight, displacedPosition.z * overhang) + aPosition;
